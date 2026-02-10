@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbs 1a Conjugació - Nivell A2</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --error: #e74c3c; --bg: #fdfefe; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { background: white; max-width: 800px; width: 100%; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: var(--primary); margin-bottom: 30px; border-bottom: 2px solid var(--secondary); padding-bottom: 10px; }
+        
+        .sentence-box { font-size: 1.6rem; margin: 40px 0; padding: 20px; background: #f8f9fa; border-radius: 10px; line-height: 2; }
+        .drop-zone { display: inline-block; width: 180px; height: 50px; border: 3px dashed var(--secondary); border-radius: 8px; vertical-align: middle; margin: 0 10px; background: #fff; transition: 0.3s; }
+        .drop-zone.hover { background: #e1f5fe; border-color: #01579b; }
+        .drop-zone.filled { border-style: solid; background: #e8f8f5; border-color: var(--success); }
+
+        .options-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
+        .option { padding: 12px 25px; background: var(--secondary); color: white; border-radius: 30px; cursor: grab; font-size: 1.2rem; font-weight: bold; user-select: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .option:active { cursor: grabbing; transform: scale(0.95); }
+        
+        #feedback { font-size: 1.5rem; font-weight: bold; margin-top: 25px; min-height: 40px; }
+        .success { color: var(--success); animation: bounce 0.5s; }
+        .error { color: var(--error); }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .progress { margin-bottom: 10px; font-weight: bold; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Practiquem els verbs (-AR)</h1>
+    <div class="progress" id="progress">Pregunta 1 de 25</div>
+    
+    <div class="sentence-box" id="sentence">
+        </div>
+
+    <div class="options-container" id="options">
+        </div>
+
+    <div id="feedback"></div>
+</div>
+
+<audio id="success-sound" src="https://www.myinstants.com/media/sounds/applause_8.mp3"></audio>
+
+<script>
+    const exercicis = [
+        { frase: "Ahir nosaltres ________ un arròs boníssim.", opcions: ["cuinàvem", "vam cuinar", "cuinem", "cuinarem"], correcta: "vam cuinar" },
+        { frase: "Normalment, jo ________ a les vuit del matí.", opcions: ["esmorzaré", "he esmorzat", "esmorzo", "esmorzava"], correcta: "esmorzo" },
+        { frase: "Demà tu ________ la roba nova.", opcions: ["estrenaràs", "estrenes", "vas estrenar", "estrenaves"], correcta: "estrenaràs" },
+        { frase: "Quan era petita, ella ________ molt a prop d'aquí.", opcions: ["ha habitat", "habitarà", "habitava", "habita"], correcta: "habitava" },
+        { frase: "Aquesta setmana vosaltres ________ molt la ciutat.", opcions: ["passegeu", "heu passejat", "passejàveu", "passejareu"], correcta: "heu passejat" },
+        { frase: "Ells ________ el cotxe cada diumenge.", opcions: ["renten", "van rentar", "rentarien", "hauran rentat"], correcta: "renten" },
+        { frase: "L'any que ve, nosaltres ________ a Itàlia.", opcions: ["viatgem", "viatjàvem", "viatjarem", "vam viatjar"], correcta: "viatjarem" },
+        { frase: "Aquest matí jo ________ totes les finestres.", opcions: ["tanco", "he tancat", "tancava", "tancaré"], correcta: "he tancat" },
+        { frase: "Mentre tu dormies, ells ________ la taula.", opcions: ["pararan", "paren", "paraven", "han parat"], correcta: "paraven" },
+        { frase: "Ahir vosaltres ________ un regal a la mare.", opcions: ["donàveu", "doneu", "donareu", "vau donar"], correcta: "vau donar" },
+        { frase: "Cada tarda, ella ________ el piano.", opcions: ["toca", "tocarà", "va tocar", "ha tocat"], correcta: "toca" },
+        { frase: "Diumenge passat jo ________ a la muntanya.", opcions: ["camino", "vaig caminar", "caminava", "caminaré"], correcta: "vaig caminar" },
+        { frase: "Nosaltres ________ ara mateix el sopar.", opcions: ["preparem", "preparàvem", "vam preparar", "prepararem"], correcta: "preparem" },
+        { frase: "Tu ________ l'examen abans-d'ahir.", opcions: ["aproves", "vas aprovar", "aprovaves", "has aprovat"], correcta: "vas aprovar" },
+        { frase: "Ells ________ una casa nova l'estiu que ve.", opcions: ["compraven", "compren", "compraran", "van comprar"], correcta: "compraran" },
+        { frase: "Jo ________ la televisió quan ha sonat el telèfon.", opcions: ["miro", "mirava", "miraré", "he mirat"], correcta: "mirava" },
+        { frase: "Aquest mes vosaltres ________ molt poc.", opcions: ["estudieu", "heu estudiat", "estudiareu", "estudiàveu"], correcta: "heu estudiat" },
+        { frase: "El curs passat nosaltres ________ molt.", opcions: ["treballem", "vam treballar", "treballarem", "treballeu"], correcta: "vam treballar" },
+        { frase: "Ella sempre ________ aigua amb gas.", opcions: ["demana", "demanava", "demanarà", "va demanar"], correcta: "demana" },
+        { frase: "Demà jo ________ el jardí.", opcions: ["arreglava", "he arreglat", "arreglaré", "arreglava"], correcta: "arreglaré" },
+        { frase: "Vosaltres ________ la veritat ahir a la nit.", opcions: ["expliqueu", "vau explicar", "expliqueu", "explicareu"], correcta: "vau explicar" },
+        { frase: "Jo ________ un pastís cada diumenge quan era jove.", opcions: ["portava", "porto", "portaré", "vaig portar"], correcta: "portava" },
+        { frase: "Ells ________ els deures aquest matí.", opcions: ["acaben", "han acabat", "acabaran", "acabaven"], correcta: "han acabat" },
+        { frase: "Nosaltres ________ la cançó demà al teatre.", opcions: ["cantem", "cantàvem", "cantarem", "vam cantar"], correcta: "cantarem" },
+        { frase: "Tu ________ a casa molt tard ahir.", opcions: ["arribes", "vas arribar", "arribaves", "arribaràs"], correcta: "vas arribar" }
+    ];
+
+    let currentIdx = 0;
+    const sentenceEl = document.getElementById('sentence');
+    const optionsEl = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+    const progressEl = document.getElementById('progress');
+
+    function loadQuestion() {
+        const item = exercicis[currentIdx];
+        progressEl.innerText = `Pregunta ${currentIdx + 1} de 25`;
+        feedbackEl.innerText = "";
+        
+        // Carregar frase amb zona de drop
+        const parts = item.frase.split("________");
+        sentenceEl.innerHTML = `${parts[0]} <div class="drop-zone" id="drop-zone"></div> ${parts[1]}`;
+
+        // Carregar opcions
+        optionsEl.innerHTML = "";
+        const shuffledOptions = [...item.opcions].sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.draggable = true;
+            div.addEventListener('dragstart', dragStart);
+            optionsEl.appendChild(div);
+        });
+
+        setupDropZone();
+    }
+
+    function dragStart(e) {
+        e.dataTransfer.setData('text', e.target.innerText);
+    }
+
+    function setupDropZone() {
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', e => e.preventDefault());
+        dropZone.addEventListener('dragenter', e => dropZone.classList.add('hover'));
+        dropZone.addEventListener('dragleave', e => dropZone.classList.remove('hover'));
+        dropZone.addEventListener('drop', handleDrop);
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const droppedText = e.dataTransfer.getData('text');
+        const dropZone = e.target;
+        const correct = exercicis[currentIdx].correcta;
+
+        dropZone.innerText = droppedText;
+        dropZone.classList.remove('hover');
+        dropZone.classList.add('filled');
+
+        if (droppedText === correct) {
+            feedbackEl.innerText = "MOLT BÉ! 👏";
+            feedbackEl.className = "success";
+            document.getElementById('success-sound').play();
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < exercicis.length) {
+                    loadQuestion();
+                } else {
+                    sentenceEl.innerHTML = "🎉 EXCEL·LENT! HAS COMPLETAT L'EXERCICI.";
+                    optionsEl.innerHTML = "";
+                }
+            }, 2000);
+        } else {
+            feedbackEl.innerText = "TORNA-HO A INTENTAR... 🤔";
+            feedbackEl.className = "error";
+            setTimeout(() => {
+                dropZone.innerText = "";
+                dropZone.classList.remove('filled');
+            }, 1500);
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
